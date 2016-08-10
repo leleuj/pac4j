@@ -62,7 +62,6 @@
 		<kryo.version>3.0.3</kryo.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<guava.version>19.0</guava.version>
-		<ehcache.version>3.1.1</ehcache.version>
 		<spring.version>4.2.4.RELEASE</spring.version>
 		<mockito.version>1.10.19</mockito.version>
 		<slf4j.version>1.7.14</slf4j.version>
@@ -122,11 +121,6 @@
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>${guava.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.ehcache</groupId>
-				<artifactId>ehcache</artifactId>
-				<version>${ehcache.version}</version>
 			</dependency>
 			<!-- for testing -->
 			<dependency>

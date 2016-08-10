@@ -19,14 +19,16 @@ import static org.junit.Assert.assertNull;
 public final class GuavaStoreTests implements TestsConstants {
 
     private GuavaStore buildStore() {
-        return new GuavaStore(10, 20, TimeUnit.SECONDS);
+        return new GuavaStore(10, 100, TimeUnit.MILLISECONDS);
     }
 
     @Test
-    public void testSetGet() {
+    public void testSetGet() throws Exception {
         final GuavaStore store = buildStore();
         store.set(KEY, VALUE);
         assertEquals(VALUE, store.get(KEY));
+        Thread.sleep(200);
+        assertNull(store.get(KEY));
     }
 
     @Test
