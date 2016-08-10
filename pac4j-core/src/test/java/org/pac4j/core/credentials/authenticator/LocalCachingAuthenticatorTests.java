@@ -20,7 +20,8 @@ import static org.junit.Assert.assertTrue;
  * @since 1.8
  */
 @SuppressWarnings("unchecked")
-public class LocalCachingAuthenticatorTests {
+@Deprecated
+public final class LocalCachingAuthenticatorTests {
 
     private static class OnlyOneCallAuthenticator implements Authenticator<UsernamePasswordCredentials> {
 
@@ -60,15 +61,6 @@ public class LocalCachingAuthenticatorTests {
         localCachingAuthenticator.validate(credentials1, null);
         final Credentials credentials2 = new UsernamePasswordCredentials("a", "a", this.getClass().getName());
         localCachingAuthenticator.validate(credentials2, null);
-    }
-
-    @Test
-    public void testNoCache() {
-        final LocalCachingAuthenticator authenticator = new
-                LocalCachingAuthenticator(this.delegate, 10, 2, TimeUnit.SECONDS);
-        authenticator.init(null);
-
-        assertFalse(authenticator.isCached(this.credentials));
     }
 
     @Test
@@ -133,7 +125,7 @@ public class LocalCachingAuthenticatorTests {
     @Test
     public void testValidateAndExpire() throws Exception {
         final LocalCachingAuthenticator authenticator = new
-                LocalCachingAuthenticator(this.delegate, 10, 500, TimeUnit.MILLISECONDS);
+                LocalCachingAuthenticator(this.delegate, 10, 400, TimeUnit.MILLISECONDS);
         authenticator.init(null);
 
         authenticator.validate(this.credentials, null);
