@@ -1,20 +1,20 @@
 package org.pac4j.core.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.pac4j.core.store.serializer.JavaSerializer;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 
 /**
- * Helper for Java serialization.
+ * Use {@link JavaSerializer} instead.
  *
  * @author Jerome Leleu
  * @since 1.8.1
+ * @deprecated
  */
+@Deprecated
 public class JavaSerializationHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(JavaSerializationHelper.class);
+    private static final JavaSerializer serializer = new JavaSerializer();
 
     /**
      * Serialize a Java object into a base64 String.
@@ -23,7 +23,7 @@ public class JavaSerializationHelper {
      * @return the base64 string of the serialized object
      */
     public String serializeToBase64(final Serializable o) {
-        return DatatypeConverter.printBase64Binary(serializeToBytes(o));
+        return serializer.serializeToBase64(o);
     }
 
     /**
@@ -33,16 +33,7 @@ public class JavaSerializationHelper {
      * @return the bytes array of the serialized object
      */
     public byte[] serializeToBytes(final Serializable o) {
-        byte[] bytes = null;
-        try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             final ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-            oos.writeObject(o);
-            oos.flush();
-            bytes = baos.toByteArray();
-        } catch (final IOException e) {
-            logger.warn("cannot Java serialize object", e);
-        }
-        return bytes;
+        return serializer.serialize(o);
     }
 
     /**
@@ -52,7 +43,7 @@ public class JavaSerializationHelper {
      * @return the unserialized Java object
      */
     public Serializable unserializeFromBase64(final String base64) {
-        return unserializeFromBytes(DatatypeConverter.parseBase64Binary(base64));
+        return serializer.deserializeFromBase64(base64);
     }
 
     /**
@@ -62,13 +53,6 @@ public class JavaSerializationHelper {
      * @return the unserialized Java object
      */
     public Serializable unserializeFromBytes(final byte[] bytes) {
-        Serializable o = null;
-        try (final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-            final ObjectInputStream ois = new ObjectInputStream(bais)) {
-            o = (Serializable) ois.readObject();
-        } catch (final IOException | ClassNotFoundException e) {
-            logger.warn("cannot Java deserialize object", e);
-        }
-        return o;
+        return serializer.deserialize(bytes);
     }
 }

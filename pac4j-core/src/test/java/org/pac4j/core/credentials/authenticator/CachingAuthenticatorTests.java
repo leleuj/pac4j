@@ -37,12 +37,27 @@ public final class CachingAuthenticatorTests implements TestsConstants {
         final NumberedAuthenticator authenticator = new NumberedAuthenticator();
         final InMemoryStore store = new InMemoryStore();
         final CachingAuthenticator cachingAuthenticator = new CachingAuthenticator(authenticator, store);
+        final Credentials credentials1 = new UsernamePasswordCredentials("0", "00", this.getClass().getName());
+        cachingAuthenticator.validate(credentials1, null);
+        final String id1 = credentials1.getUserProfile().getId();
+        final Credentials credentials2 = new UsernamePasswordCredentials("0", "00", this.getClass().getName());
+        cachingAuthenticator.validate(credentials2, null);
+        final String id2 = credentials2.getUserProfile().getId();
+        assertEquals(id1, id2);
+    }
+
+    @Test
+    public void testWithoutCache() throws HttpAction {
+        final NumberedAuthenticator authenticator = new NumberedAuthenticator();
+        final InMemoryStore store = new InMemoryStore();
+        final CachingAuthenticator cachingAuthenticator = new CachingAuthenticator(authenticator, store);
         final Credentials credentials1 = new UsernamePasswordCredentials("a", "a", this.getClass().getName());
         cachingAuthenticator.validate(credentials1, null);
         final String id1 = credentials1.getUserProfile().getId();
-        final Credentials credentials2 = new UsernamePasswordCredentials("a", "a", this.getClass().getName());
+        final Credentials credentials2 = new UsernamePasswordCredentials("a", "b", this.getClass().getName());
         cachingAuthenticator.validate(credentials2, null);
-        final String id2 = credentials1.getUserProfile().getId();
-        assertEquals(id1, id2);
+        final String id2 = credentials2.getUserProfile().getId();
+        assertEquals("0", id1);
+        assertEquals("1", id2);
     }
 }

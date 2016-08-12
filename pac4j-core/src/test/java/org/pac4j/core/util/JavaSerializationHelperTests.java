@@ -10,7 +10,9 @@ import static org.junit.Assert.*;
  *
  * @author Jerome Leleu
  * @since 1.8.1
+ * @deprecated
  */
+@Deprecated
 public final class JavaSerializationHelperTests implements TestsConstants {
 
     private JavaSerializationHelper helper = new JavaSerializationHelper();

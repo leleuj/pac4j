@@ -1,28 +1,28 @@
 package org.pac4j.core.util;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
+import org.pac4j.core.store.serializer.KryoSerializer;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 
 /**
- * Helper for Kryo serialization.
+ * Use {@link KryoSerializer} instead.
  *
  * @author Jerome Leleu
  * @since 1.8.1
+ * @deprecated
  */
+@Deprecated
 public class KryoSerializationHelper {
 
-    private final Kryo kryo;
+    private final KryoSerializer serializer;
 
     public KryoSerializationHelper() {
-        this.kryo = new Kryo();
+        this(new Kryo());
     }
 
     public KryoSerializationHelper(final Kryo kryo) {
-        this.kryo = kryo;
+        this.serializer = new KryoSerializer(kryo);
     }
 
     /**
@@ -32,7 +32,7 @@ public class KryoSerializationHelper {
      * @return the base64 string of the serialized object
      */
     public String serializeToBase64(final Serializable o) {
-        return DatatypeConverter.printBase64Binary(serializeToBytes(o));
+        return serializer.serializeToBase64(o);
     }
 
     /**
@@ -42,12 +42,7 @@ public class KryoSerializationHelper {
      * @return the bytes array of the serialized object
      */
     public byte[] serializeToBytes(final Serializable o) {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try (final Output output = new Output(byteStream)) {
-            kryo.writeClassAndObject(output, o);
-            output.flush();
-            return byteStream.toByteArray();
-        }
+        return serializer.serialize(o);
     }
 
     /**
@@ -57,7 +52,7 @@ public class KryoSerializationHelper {
      * @return the unserialized Java object
      */
     public Serializable unserializeFromBase64(final String base64) {
-        return unserializeFromBytes(DatatypeConverter.parseBase64Binary(base64));
+        return serializer.deserializeFromBase64(base64);
     }
 
     /**
@@ -67,9 +62,6 @@ public class KryoSerializationHelper {
      * @return the unserialized Java object
      */
     public Serializable unserializeFromBytes(final byte[] bytes) {
-        try (final Input input = new Input(new ByteArrayInputStream(bytes))) {
-            final Serializable obj =  (Serializable) kryo.readClassAndObject(input);
-            return obj;
-        }
+        return serializer.deserialize(bytes);
     }
 }

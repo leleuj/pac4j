@@ -1,21 +1,20 @@
-package org.pac4j.core.util;
+package org.pac4j.core.store.serializer;
 
 import org.junit.Test;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.util.TestsConstants;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests {@link KryoSerializationHelper}.
+ * Abstract serializer tests.
  *
  * @author Jerome Leleu
- * @since 1.8.1
- * @deprecated
+ * @since 1.9.2
  */
-@Deprecated
-public final class KryoSerializationHelperTests implements TestsConstants {
+public abstract class AbstractSerializerTests implements TestsConstants {
 
-    private KryoSerializationHelper helper = new KryoSerializationHelper();
+    protected abstract Serializer getSerializer();
 
     private CommonProfile getUserProfile() {
         final CommonProfile profile = new CommonProfile();
@@ -27,8 +26,8 @@ public final class KryoSerializationHelperTests implements TestsConstants {
     @Test
     public void testBytesSerialization() {
         final CommonProfile profile = getUserProfile();
-        final byte[] serialized = helper.serializeToBytes(profile);
-        final CommonProfile profile2 = (CommonProfile) helper.unserializeFromBytes(serialized);
+        final byte[] serialized = getSerializer().serialize(profile);
+        final CommonProfile profile2 = (CommonProfile) getSerializer().deserialize(serialized);
         assertEquals(profile.getId(), profile2.getId());
         assertEquals(profile.getAttribute(NAME), profile2.getAttribute(NAME));
     }
@@ -36,8 +35,8 @@ public final class KryoSerializationHelperTests implements TestsConstants {
     @Test
     public void testBase64StringSerialization() {
         final CommonProfile profile = getUserProfile();
-        final String serialized = helper.serializeToBase64(profile);
-        final CommonProfile profile2 = (CommonProfile) helper.unserializeFromBase64(serialized);
+        final String serialized = getSerializer().serializeToBase64(profile);
+        final CommonProfile profile2 = (CommonProfile) getSerializer().deserializeFromBase64(serialized);
         assertEquals(profile.getId(), profile2.getId());
         assertEquals(profile.getAttribute(NAME), profile2.getAttribute(NAME));
     }
