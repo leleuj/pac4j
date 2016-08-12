@@ -12,7 +12,7 @@ import java.io.*;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class KryoSerializer<T extends Serializable> implements Serializer<T> {
+public class KryoSerializer<T> implements Serializer<T> {
 
     private final Kryo kryo;
 

@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
  */
 public class J2ESessionStore implements SessionStore<J2EContext> {
 
-    private HttpSession getHttpSession(final J2EContext context) {
+    protected HttpSession getHttpSession(final J2EContext context) {
         return context.getRequest().getSession();
     }
 
@@ -34,5 +34,15 @@ public class J2ESessionStore implements SessionStore<J2EContext> {
     @Override
     public void invalidateSession(final J2EContext context) {
         getHttpSession(context).invalidate();
+    }
+
+    @Override
+    public Object getTrackableObject(final J2EContext context) {
+        return getHttpSession(context);
+    }
+
+    @Override
+    public SessionStore<J2EContext> renewFromTrackableObject(final J2EContext context, final Object trackableSession) {
+        return new J2EProvidedSessionStore((HttpSession) trackableSession);
     }
 }

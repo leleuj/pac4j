@@ -35,12 +35,27 @@ public final class MemcachedStoreIT implements TestsConstants {
     }
 
     @Test
-    public void testSetGet() throws Exception {
+    public void testSetRemoveGet() {
+        final MemcachedStore store = buildStore();
+        store.set(KEY, VALUE);
+        assertEquals(VALUE, store.get(KEY));
+        store.remove(KEY);
+        assertNull(store.get(KEY));
+    }
+
+    @Test
+    public void testSetExpiredGet() throws Exception {
         final MemcachedStore store = buildStore();
         store.set(KEY, VALUE);
         assertEquals(VALUE, store.get(KEY));
         Thread.sleep(2000);
         assertNull(store.get(KEY));
+    }
+
+    @Test
+    public void testSetNullValue() {
+        final MemcachedStore store = buildStore();
+        TestsHelper.expectException(() -> store.set(KEY, null), TechnicalException.class, "value cannot be null");
     }
 
     @Test

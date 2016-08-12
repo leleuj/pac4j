@@ -34,12 +34,27 @@ public final class EhCacheStoreTests implements TestsConstants {
     }
 
     @Test
-    public void testSetGet() throws Exception {
+    public void testSetRemoveGet() {
+        final EhCacheStore store = buildStore();
+        store.set(KEY, VALUE);
+        assertEquals(VALUE, store.get(KEY));
+        store.remove(KEY);
+        assertNull(store.get(KEY));
+    }
+
+    @Test
+    public void testSetExpiredGet() throws Exception {
         final EhCacheStore store = buildStore();
         store.set(KEY, VALUE);
         assertEquals(VALUE, store.get(KEY));
         Thread.sleep(200);
         assertNull(store.get(KEY));
+    }
+
+    @Test
+    public void testSetNullValue() {
+        final EhCacheStore store = buildStore();
+        TestsHelper.expectException(() -> store.set(KEY, null), TechnicalException.class, "value cannot be null");
     }
 
     @Test

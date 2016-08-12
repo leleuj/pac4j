@@ -1,14 +1,12 @@
 package org.pac4j.core.store;
 
-import java.io.Serializable;
-
 /**
  * Store data.
  *
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public interface Store<K extends Serializable, O extends Serializable> {
+public interface Store<K, O> {
 
     /**
      * Get a value by key.
@@ -25,4 +23,11 @@ public interface Store<K extends Serializable, O extends Serializable> {
      * @param value the value
      */
     void set(K key, O value);
+
+    /**
+     * Remove the value associated to the key.
+     *
+     * @param key the key
+     */
+    void remove(K key);
 }

@@ -1,5 +1,7 @@
 package org.pac4j.core.context;
 
+import org.pac4j.core.context.session.SessionStore;
+
 import java.util.Collection;
 import java.util.Map;
 
@@ -10,6 +12,24 @@ import java.util.Map;
  * @since 1.4.0
  */
 public interface WebContext {
+
+    /**
+     * Get the session store.
+     *
+     * @return the session store
+     */
+    default SessionStore getSessionStore() {
+        throw new UnsupportedOperationException("To be implemented");
+    }
+
+    /**
+     * Set the session store.
+     *
+     * @param sessionStore the session store
+     */
+    default void setSessionStore(SessionStore sessionStore) {
+        throw new UnsupportedOperationException("To be implemented");
+    }
 
     /**
      * Return a request parameter.

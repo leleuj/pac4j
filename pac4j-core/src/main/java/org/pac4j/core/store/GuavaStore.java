@@ -5,7 +5,6 @@ import com.google.common.cache.CacheBuilder;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.core.util.InitializableObject;
 
-import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class GuavaStore<K extends Serializable, O extends Serializable> extends InitializableObject implements Store<K, O> {
+public class GuavaStore<K, O> extends InitializableObject implements Store<K, O> {
 
     private Cache<K, O> cache;
 
@@ -48,14 +47,28 @@ public class GuavaStore<K extends Serializable, O extends Serializable> extends 
     public O get(final K key) {
         init();
 
-        return cache.getIfPresent(key);
+        if (key != null) {
+            return cache.getIfPresent(key);
+        }
+        return null;
     }
 
     @Override
     public void set(final K key, final O value) {
         init();
+        CommonHelper.assertNotNull("value", value);
 
-        cache.put(key, value);
+        if (key != null) {
+            cache.put(key, value);
+        }
+    }
+
+    @Override
+    public void remove(final K key) {
+        init();
+        if (key != null) {
+            cache.invalidate(key);
+        }
     }
 
     public Cache<K, O> getCache() {

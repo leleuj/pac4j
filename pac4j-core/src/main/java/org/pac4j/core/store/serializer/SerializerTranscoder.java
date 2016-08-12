@@ -4,15 +4,13 @@ import net.spy.memcached.CachedData;
 import net.spy.memcached.transcoders.Transcoder;
 import org.pac4j.core.util.CommonHelper;
 
-import java.io.Serializable;
-
 /**
  * Transcoder to wrap a {@link Serializer}.
  *
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class SerializerTranscoder<T extends Serializable> implements Transcoder<T> {
+public class SerializerTranscoder<T> implements Transcoder<T> {
 
     private final Serializer<T> serializer;
 

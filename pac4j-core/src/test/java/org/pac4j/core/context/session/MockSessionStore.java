@@ -16,9 +16,20 @@ public class MockSessionStore implements SessionStore {
 
     protected Map<String, Object> store = new HashMap<>();
 
+    protected String id;
+
+    public MockSessionStore() {}
+
+    public MockSessionStore(final Map<String, Object> store) {
+        this.store = store;
+    }
+
     @Override
     public String getOrCreateSessionId(final WebContext context) {
-        return new Date().toString();
+        if (id == null) {
+            id = new Date().toString();
+        }
+        return id;
     }
 
     @Override
@@ -29,5 +40,20 @@ public class MockSessionStore implements SessionStore {
     @Override
     public void set(final WebContext context, final String key, final Object value) {
         store.put(key, value);
+    }
+
+    @Override
+    public void invalidateSession(final WebContext context) {
+        store.clear();
+    }
+
+    @Override
+    public  Object getTrackableObject(final WebContext context) {
+        return store;
+    }
+
+    @Override
+    public SessionStore<WebContext> renewFromTrackableObject(final WebContext context, final Object trackableSession) {
+        return new MockSessionStore((Map<String, Object>) trackableSession);
     }
 }

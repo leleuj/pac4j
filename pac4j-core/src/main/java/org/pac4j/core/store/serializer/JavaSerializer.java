@@ -11,7 +11,7 @@ import java.io.*;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class JavaSerializer<T extends Serializable> implements Serializer<T> {
+public class JavaSerializer<T> implements Serializer<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(JavaSerializer.class);
 

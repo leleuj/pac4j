@@ -1,7 +1,6 @@
 package org.pac4j.core.store.serializer;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.Serializable;
 
 /**
  * The serializer interface.
@@ -9,7 +8,7 @@ import java.io.Serializable;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public interface Serializer<T extends Serializable> {
+public interface Serializer<T> {
 
     /**
      * Serialize a Java object into a base64 String.

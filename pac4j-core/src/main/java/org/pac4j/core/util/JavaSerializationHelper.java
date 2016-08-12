@@ -43,7 +43,7 @@ public class JavaSerializationHelper {
      * @return the unserialized Java object
      */
     public Serializable unserializeFromBase64(final String base64) {
-        return serializer.deserializeFromBase64(base64);
+        return (Serializable) serializer.deserializeFromBase64(base64);
     }
 
     /**
@@ -53,6 +53,6 @@ public class JavaSerializationHelper {
      * @return the unserialized Java object
      */
     public Serializable unserializeFromBytes(final byte[] bytes) {
-        return serializer.deserialize(bytes);
+        return (Serializable) serializer.deserialize(bytes);
     }
 }

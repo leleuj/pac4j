@@ -23,7 +23,16 @@ public final class GuavaStoreTests implements TestsConstants {
     }
 
     @Test
-    public void testSetGet() throws Exception {
+    public void testSetRemoveGet() {
+        final GuavaStore store = buildStore();
+        store.set(KEY, VALUE);
+        assertEquals(VALUE, store.get(KEY));
+        store.remove(KEY);
+        assertNull(store.get(KEY));
+    }
+
+    @Test
+    public void testSetExpiredGet() throws Exception {
         final GuavaStore store = buildStore();
         store.set(KEY, VALUE);
         assertEquals(VALUE, store.get(KEY));
@@ -32,9 +41,9 @@ public final class GuavaStoreTests implements TestsConstants {
     }
 
     @Test
-    public void testMissingObject() {
+    public void testSetNullValue() {
         final GuavaStore store = buildStore();
-        assertNull(store.get(KEY));
+        TestsHelper.expectException(() -> store.set(KEY, null), TechnicalException.class, "value cannot be null");
     }
 
     @Test

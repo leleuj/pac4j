@@ -1,6 +1,7 @@
 package org.pac4j.core.store;
 
-import java.io.Serializable;
+import org.pac4j.core.util.CommonHelper;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class InMemoryStore<K extends Serializable, O extends Serializable> implements Store<K, O> {
+public class InMemoryStore<K, O> implements Store<K, O> {
 
     private final ConcurrentHashMap<K, O> map = new ConcurrentHashMap<>();
 
@@ -17,12 +18,26 @@ public class InMemoryStore<K extends Serializable, O extends Serializable> imple
 
     @Override
     public O get(final K key) {
-        return map.get(key);
+        if (key != null) {
+            return map.get(key);
+        }
+        return null;
     }
 
     @Override
     public void set(final K key, final O value) {
-        map.put(key, value);
+        CommonHelper.assertNotNull("value", value);
+
+        if (key != null) {
+            map.put(key, value);
+        }
+    }
+
+    @Override
+    public void remove(final K key) {
+        if (key != null) {
+            map.remove(key);
+        }
     }
 
     public ConcurrentHashMap<K, O> getCache() {

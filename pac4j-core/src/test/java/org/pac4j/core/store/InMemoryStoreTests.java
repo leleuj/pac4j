@@ -1,7 +1,9 @@
 package org.pac4j.core.store;
 
 import org.junit.Test;
+import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.util.TestsConstants;
+import org.pac4j.core.util.TestsHelper;
 
 import static org.junit.Assert.*;
 
@@ -18,10 +20,18 @@ public final class InMemoryStoreTests implements TestsConstants {
     }
 
     @Test
-    public void testSetGet() {
+    public void testSetRemoveGet() {
         final InMemoryStore store = buildStore();
         store.set(KEY, VALUE);
         assertEquals(VALUE, store.get(KEY));
+        store.remove(KEY);
+        assertNull(store.get(KEY));
+    }
+
+    @Test
+    public void testSetNullValue() {
+        final InMemoryStore store = buildStore();
+        TestsHelper.expectException(() -> store.set(KEY, null), TechnicalException.class, "value cannot be null");
     }
 
     @Test

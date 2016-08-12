@@ -44,4 +44,27 @@ public interface SessionStore<C extends WebContext> {
     default void invalidateSession(C context) {
         throw new UnsupportedOperationException("To be implemented");
     }
+
+    /**
+     * Get the native session as trackable object.
+     *
+     * @param context the web context
+     * @return the trackable object
+     */
+    default Object getTrackableObject(C context) {
+        // for backward compatibility
+        return null;
+    }
+
+    /**
+     * Renew the session store from a trackable object.
+     *
+     * @param context the web context
+     * @param trackableSession the trackable session
+     * @return the new session store
+     */
+    default SessionStore<C> renewFromTrackableObject(C context, Object trackableSession) {
+        // for backward compatibility
+        return null;
+    }
 }

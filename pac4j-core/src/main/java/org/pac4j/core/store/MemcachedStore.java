@@ -8,8 +8,6 @@ import org.pac4j.core.store.serializer.SerializerTranscoder;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.core.util.InitializableObject;
 
-import java.io.Serializable;
-
 /**
  * Store data in Memcached.
  *
@@ -18,7 +16,7 @@ import java.io.Serializable;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class MemcachedStore<K extends Serializable, O extends Serializable> extends InitializableObject implements Store<K, O> {
+public class MemcachedStore<K, O> extends InitializableObject implements Store<K, O> {
 
     private MemcachedClientIF client;
 
@@ -54,14 +52,28 @@ public class MemcachedStore<K extends Serializable, O extends Serializable> exte
     public O get(final K key) {
         init();
 
-        return client.get(serializer.serializeToBase64(key), this.transcoder);
+        if (key != null) {
+            return client.get(serializer.serializeToBase64(key), this.transcoder);
+        }
+        return null;
     }
 
     @Override
     public void set(final K key, final O value) {
         init();
+        CommonHelper.assertNotNull("value", value);
 
-        client.set(serializer.serializeToBase64(key), timeoutSeconds, value, this.transcoder);
+        if (key != null) {
+            client.set(serializer.serializeToBase64(key), timeoutSeconds, value, this.transcoder);
+        }
+    }
+
+    @Override
+    public void remove(final K key) {
+        init();
+        if (key != null) {
+            client.delete(serializer.serializeToBase64(key));
+        }
     }
 
     public MemcachedClientIF getClient() {
