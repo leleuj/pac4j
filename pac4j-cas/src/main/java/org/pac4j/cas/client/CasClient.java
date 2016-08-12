@@ -22,7 +22,7 @@ import org.pac4j.core.util.CommonHelper;
  *
  * <p>The configuration can be defined via the {@link #configuration} object.</p>
  *
- * <p>In a J2E context, the {@link CasLogoutHandler} will be a {@link DefaultCasLogoutHandler}. For other environment, it must be explicitly defined to handle CAS logout requests.</p>
+ * <p>By default, the {@link CasLogoutHandler} will be a {@link DefaultCasLogoutHandler}. Use {@link org.pac4j.cas.logout.NoLogoutHandler} to disable logout support.</p>
  *
  * <p>For proxy support, a {@link CasProxyReceptor} must be defined in the configuration (the corresponding "callback filter" must be enabled)
  * and set to the CAS configuration of this client. In that case, a {@link org.pac4j.cas.profile.CasProxyProfile} will be return

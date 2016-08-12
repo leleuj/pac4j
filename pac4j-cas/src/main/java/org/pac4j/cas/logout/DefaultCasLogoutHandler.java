@@ -34,13 +34,9 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
         final Object trackableSession = sessionStore.getTrackableObject(context);
 
         logger.debug("ticket: {} -> trackableSession: {}", ticket, trackableSession);
-        logger.debug("sessionId: {}", protectSessionId(sessionId));
+        logger.debug("sessionId: {}", sessionId);
         store.set(ticket, trackableSession);
         store.set(sessionId, ticket);
-    }
-
-    protected String protectSessionId(final String id) {
-        return id.substring(0, 6) + "****";
     }
 
     @Override
@@ -49,7 +45,7 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
 
         final SessionStore sessionStore = context.getSessionStore();
         final String currentSessionId = sessionStore.getOrCreateSessionId(context);
-        logger.debug("currentSessionId: {}", protectSessionId(currentSessionId));
+        logger.debug("currentSessionId: {}", currentSessionId);
         final String sessionToTicket = (String) store.get(currentSessionId);
         logger.debug("-> ticket: {}", ticket);
         store.remove(currentSessionId);
@@ -86,7 +82,7 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
             if (newSesionStore != null) {
                 context.setSessionStore(newSesionStore);
                 final String sessionId = newSesionStore.getOrCreateSessionId(context);
-                logger.debug("remove sessionId: {}", protectSessionId(sessionId));
+                logger.debug("remove sessionId: {}", sessionId);
                 store.remove(sessionId);
 
                 destroy(context, newSesionStore);
