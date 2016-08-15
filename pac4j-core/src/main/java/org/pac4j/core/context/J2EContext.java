@@ -84,26 +84,6 @@ public class J2EContext implements WebContext {
     }
 
     @Override
-    public void setSessionAttribute(final String name, final Object value) {
-        sessionStore.set(this, name, value);
-    }
-
-    @Override
-    public Object getSessionAttribute(final String name) {
-        return sessionStore.get(this, name);
-    }
-
-    @Override
-    public Object getSessionIdentifier() {
-        return sessionStore.getOrCreateSessionId(this);
-    }
-
-    @Override
-    public void invalidationSession() {
-        sessionStore.invalidateSession(this);
-    }
-
-    @Override
     public String getRequestMethod() {
         return this.request.getMethod();
     }

@@ -154,21 +154,6 @@ public final class MockWebContext implements WebContext {
     }
 
     @Override
-    public void setSessionAttribute(final String name, final Object value) {
-        this.sessionStore.set(this, name, value);
-    }
-
-    @Override
-    public Object getSessionAttribute(final String name) {
-        return this.sessionStore.get(this, name);
-    }
-
-    @Override
-    public Object getSessionIdentifier() {
-        return sessionStore.getOrCreateSessionId(this);
-    }
-
-    @Override
     public String getRequestMethod() {
         return this.method;
     }

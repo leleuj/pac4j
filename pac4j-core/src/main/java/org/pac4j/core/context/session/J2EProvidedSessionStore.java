@@ -1,6 +1,7 @@
 package org.pac4j.core.context.session;
 
 import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.util.CommonHelper;
 
 import javax.servlet.http.HttpSession;
 
@@ -10,14 +11,16 @@ import javax.servlet.http.HttpSession;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class J2EProvidedSessionStore extends J2ESessionStore {
+class J2EProvidedSessionStore extends J2ESessionStore {
 
     private final HttpSession session;
 
     public J2EProvidedSessionStore(final HttpSession session) {
+        CommonHelper.assertNotNull("session", session);
         this.session = session;
     }
 
+    @Override
     protected HttpSession getHttpSession(final J2EContext context) {
         return session;
     }

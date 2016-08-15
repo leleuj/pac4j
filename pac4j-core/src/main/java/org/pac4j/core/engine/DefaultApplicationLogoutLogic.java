@@ -75,7 +75,7 @@ public class DefaultApplicationLogoutLogic<R, C extends WebContext> implements A
      */
     protected void postLogout(final C context) {
         if (this.killSession) {
-            context.invalidationSession();
+            context.getSessionStore().invalidateSession(context);
         }
     }
 

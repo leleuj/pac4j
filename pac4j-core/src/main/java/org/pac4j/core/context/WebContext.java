@@ -76,7 +76,9 @@ public interface WebContext {
      * @param name name of the session attribute
      * @param value value of the session attribute
      */
-    void setSessionAttribute(String name, Object value);
+    default void setSessionAttribute(String name, Object value) {
+        getSessionStore().set(this, name, value);
+    }
 
     /**
      * Get an attribute from session.
@@ -84,19 +86,18 @@ public interface WebContext {
      * @param name name of the session attribute
      * @return the session attribute
      */
-    Object getSessionAttribute(String name);
+    default Object getSessionAttribute(String name) {
+        return getSessionStore().get(this, name);
+    }
 
     /**
      * Gets the session id for this context.
      * @return the session identifier
+     * @deprecated
      */
-    Object getSessionIdentifier();
-
-    /**
-     * Invalidate the whole session.
-     */
-    default void invalidationSession() {
-        throw new UnsupportedOperationException("To be implemented");
+    @Deprecated
+    default Object getSessionIdentifier() {
+        return getSessionStore().getOrCreateSessionId(this);
     }
 
     /**

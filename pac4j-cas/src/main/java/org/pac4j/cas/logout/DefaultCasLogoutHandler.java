@@ -11,6 +11,7 @@ import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,12 +32,16 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
     public void recordSession(final C context, final String ticket) {
         final SessionStore sessionStore = context.getSessionStore();
         final String sessionId = sessionStore.getOrCreateSessionId(context);
-        final Object trackableSession = sessionStore.getTrackableObject(context);
+        final Optional<Object> trackableSession = sessionStore.getTrackableSession(context);
 
-        logger.debug("ticket: {} -> trackableSession: {}", ticket, trackableSession);
-        logger.debug("sessionId: {}", sessionId);
-        store.set(ticket, trackableSession);
-        store.set(sessionId, ticket);
+        if (trackableSession.isPresent()) {
+            logger.debug("ticket: {} -> trackableSession: {}", ticket, trackableSession.get());
+            logger.debug("sessionId: {}", sessionId);
+            store.set(ticket, trackableSession);
+            store.set(sessionId, ticket);
+        } else {
+            logger.debug("No trackable session for the current session store: {}", sessionStore);
+        }
     }
 
     @Override
@@ -53,7 +58,7 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
         if (CommonHelper.areEquals(ticket, sessionToTicket)) {
             destroy(context, sessionStore);
         } else {
-            logger.error("Can not delete the pac4j profiles and optionally the web session for CAS front channel logout because the provided ticket is not the same as the one linked to the web session");
+            logger.error("The user profiles (and session) can not be destroyed for CAS front channel logout because the provided ticket is not the same as the one linked to the current session");
         }
     }
 
@@ -61,36 +66,38 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
         // remove profiles
         final ProfileManager manager = new ProfileManager(context);
         manager.logout();
+        logger.debug("destroy the user profiles");
         // and optionally the web session
         if (killSession) {
+            logger.debug("destroy the whole session");
             sessionStore.invalidateSession(context);
         }
     }
 
     @Override
     public void destroySessionBack(final C context, final String ticket) {
-        final Object trackableObject = store.get(ticket);
-        logger.debug("ticket: {} -> trackableObject: {}", ticket, trackableObject);
-        if (trackableObject != null) {
+        final Object trackableSession = store.get(ticket);
+        logger.debug("ticket: {} -> trackableSession: {}", ticket, trackableSession);
+        if (trackableSession == null) {
+            logger.error("No trackable session found for back channel logout. Either the session store does not support to track session or it has expired from the store and the store settings must be updated");
+        } else {
             store.remove(ticket);
 
             // renew context with the original session store
             final SessionStore sessionStore = context.getSessionStore();
-            final SessionStore newSesionStore = sessionStore.renewFromTrackableObject(context, trackableObject);
-            logger.debug("newSesionStore: {}", newSesionStore);
-            // can be null (backward compatibility for version 1.9) @Deprecated
-            if (newSesionStore != null) {
-                context.setSessionStore(newSesionStore);
-                final String sessionId = newSesionStore.getOrCreateSessionId(context);
+            final Optional<SessionStore> optNewSesionStore = sessionStore.buildFromTrackableSession(context, trackableSession);
+            if (optNewSesionStore.isPresent()) {
+                final SessionStore newSessionStore = optNewSesionStore.get();
+                logger.debug("newSesionStore: {}", newSessionStore);
+                context.setSessionStore(newSessionStore);
+                final String sessionId = newSessionStore.getOrCreateSessionId(context);
                 logger.debug("remove sessionId: {}", sessionId);
                 store.remove(sessionId);
 
-                destroy(context, newSesionStore);
+                destroy(context, newSessionStore);
             } else {
-                logger.error("sessionStore.renewFromTrackableObject returns null, ignoring for backward compatibility in version 1.9 of pac4j");
+                logger.error("The session store should be able to build a new session store from the tracked session");
             }
-        } else {
-            logger.error("Can not delete the pac4j profiles and optionally the web session for CAS back channel logout because the tracked session is null");
         }
     }
 
