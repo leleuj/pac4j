@@ -70,7 +70,10 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
         // and optionally the web session
         if (killSession) {
             logger.debug("destroy the whole session");
-            sessionStore.invalidateSession(context);
+            final boolean invalidated = sessionStore.invalidateSession(context);
+            if (!invalidated) {
+                logger.error("The session has not been invalidated");
+            }
         }
     }
 
@@ -79,7 +82,7 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
         final Object trackableSession = store.get(ticket);
         logger.debug("ticket: {} -> trackableSession: {}", ticket, trackableSession);
         if (trackableSession == null) {
-            logger.error("No trackable session found for back channel logout. Either the session store does not support to track session or it has expired from the store and the store settings must be updated");
+            logger.error("No trackable session found for back channel logout. Either the session store does not support to track session or it has expired from the store and the store settings must be updated (expired data)");
         } else {
             store.remove(ticket);
 

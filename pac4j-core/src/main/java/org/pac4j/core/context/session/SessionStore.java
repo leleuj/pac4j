@@ -43,8 +43,9 @@ public interface SessionStore<C extends WebContext> {
      *
      * @param context the web context
      */
-    default void invalidateSession(C context) {
-        throw new UnsupportedOperationException("To be implemented");
+    default boolean invalidateSession(C context) {
+        // by default, the session has not been invalidated
+        return false;
     }
 
     /**
@@ -76,7 +77,7 @@ public interface SessionStore<C extends WebContext> {
      * @param context the web context
      * @return whether the session store has renewed the session
      */
-    default boolean renew(C context) {
+    default boolean renewSession(C context) {
         // by default, the session store does not know how to renew the native session
         return false;
     }

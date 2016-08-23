@@ -27,6 +27,7 @@ public class DefaultApplicationLogoutLogic<R, C extends WebContext> implements A
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private Function<C, ProfileManager> profileManagerFactory = context -> new ProfileManager(context);
+
     private boolean killSession;
 
     @Override
@@ -77,7 +78,10 @@ public class DefaultApplicationLogoutLogic<R, C extends WebContext> implements A
      */
     protected void postLogout(final C context) {
         if (this.killSession) {
-            context.getSessionStore().invalidateSession(context);
+            final boolean invalidated = context.getSessionStore().invalidateSession(context);
+            if (!invalidated) {
+                logger.error("The session has not been invalidated");
+            }
         }
     }
 

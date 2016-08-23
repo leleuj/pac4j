@@ -41,8 +41,9 @@ public class J2ESessionStore implements SessionStore<J2EContext> {
     }
 
     @Override
-    public void invalidateSession(final J2EContext context) {
+    public boolean invalidateSession(final J2EContext context) {
         getHttpSession(context).invalidate();
+        return true;
     }
 
     @Override
@@ -56,7 +57,7 @@ public class J2ESessionStore implements SessionStore<J2EContext> {
     }
 
     @Override
-    public boolean renew(final J2EContext context) {
+    public boolean renewSession(final J2EContext context) {
         final HttpServletRequest request = context.getRequest();
         final HttpSession session = request.getSession();
         logger.debug("Discard old session: {}", session.getId());

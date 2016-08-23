@@ -44,10 +44,10 @@ public class MockSessionStore implements SessionStore<MockWebContext> {
     }
 
     @Override
-    public void invalidateSession(final MockWebContext context) {
+    public boolean invalidateSession(final MockWebContext context) {
         store.clear();
-
         id = null;
+        return true;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MockSessionStore implements SessionStore<MockWebContext> {
     }
 
     @Override
-    public boolean renew(final MockWebContext context) {
+    public boolean renewSession(final MockWebContext context) {
         id = null;
         return true;
     }

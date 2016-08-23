@@ -102,9 +102,9 @@ public class DefaultCallbackLogic<R, C extends WebContext> implements CallbackLo
     }
 
     protected void renewSession(final C context) {
-        final boolean renewed = context.getSessionStore().renew(context);
+        final boolean renewed = context.getSessionStore().renewSession(context);
         if (!renewed) {
-            logger.error("Unable to renew the session. The session store certainly does not support this feature");
+            logger.error("Unable to renew the session. The session store may not support this feature");
         }
     }
 
