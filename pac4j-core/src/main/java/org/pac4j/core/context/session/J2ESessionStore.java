@@ -9,7 +9,6 @@ import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Store data in the J2E web session.
@@ -47,13 +46,17 @@ public class J2ESessionStore implements SessionStore<J2EContext> {
     }
 
     @Override
-    public Optional<Object> getTrackableSession(final J2EContext context) {
-        return Optional.of(getHttpSession(context));
+    public Object getTrackableSession(final J2EContext context) {
+        return getHttpSession(context);
     }
 
     @Override
-    public Optional<SessionStore<J2EContext>> buildFromTrackableSession(final J2EContext context, final Object trackableSession) {
-        return Optional.of(new J2EProvidedSessionStore((HttpSession) trackableSession));
+    public SessionStore<J2EContext> buildFromTrackableSession(final J2EContext context, final Object trackableSession) {
+        if (trackableSession != null) {
+            return new J2EProvidedSessionStore((HttpSession) trackableSession);
+        } else {
+            return null;
+        }
     }
 
     @Override

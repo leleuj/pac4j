@@ -104,6 +104,14 @@ public class CasClient extends IndirectClientV2<TokenCredentials, CasProfile> {
         this.configuration = configuration;
     }
 
+    @Override
+    public void notifySessionRenewal(final String oldSessionId, final WebContext context) {
+        final CasLogoutHandler casLogoutHandler = configuration.getLogoutHandler();
+        if (casLogoutHandler != null) {
+            casLogoutHandler.renewSession(oldSessionId, context);
+        }
+    }
+
     @Deprecated
     public void setCasLoginUrl(final String casLoginUrl) {
         configuration.setLoginUrl(casLoginUrl);

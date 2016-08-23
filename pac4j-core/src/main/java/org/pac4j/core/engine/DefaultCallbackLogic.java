@@ -1,11 +1,13 @@
 package org.pac4j.core.engine;
 
+import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.http.HttpActionAdapter;
@@ -14,6 +16,7 @@ import org.pac4j.core.profile.ProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.function.Function;
 
 import static org.pac4j.core.util.CommonHelper.*;
@@ -79,7 +82,7 @@ public class DefaultCallbackLogic<R, C extends WebContext> implements CallbackLo
 
             final CommonProfile profile = client.getUserProfile(credentials, context);
             logger.debug("profile: {}", profile);
-            saveUserProfile(context, profile, multiProfile, renewSession);
+            saveUserProfile(context, config, profile, multiProfile, renewSession);
             action = redirectToOriginallyRequestedUrl(context, defaultUrl);
 
         } catch (final HttpAction e) {
@@ -90,20 +93,33 @@ public class DefaultCallbackLogic<R, C extends WebContext> implements CallbackLo
         return httpActionAdapter.adapt(action.getCode(), context);
     }
 
-    protected void saveUserProfile(final C context, final CommonProfile profile,
+    protected void saveUserProfile(final C context, final Config config, final CommonProfile profile,
                                    final boolean multiProfile, final boolean renewSession) {
         final ProfileManager manager = getProfileManager(context);
         if (profile != null) {
             manager.save(true, profile, multiProfile);
             if (renewSession) {
-                renewSession(context);
+                renewSession(context, config);
             }
         }
     }
 
-    protected void renewSession(final C context) {
-        final boolean renewed = context.getSessionStore().renewSession(context);
-        if (!renewed) {
+    protected void renewSession(final C context, final Config config) {
+        final SessionStore<C> sessionStore = context.getSessionStore();
+        final String oldSessionId = sessionStore.getOrCreateSessionId(context);
+        final boolean renewed = sessionStore.renewSession(context);
+        if (renewed) {
+            final String newSessionId = sessionStore.getOrCreateSessionId(context);
+            logger.debug("Renewing session: {} -> {}", oldSessionId, newSessionId);
+            final Clients clients = config.getClients();
+            if (clients != null) {
+                final List<Client> clientList = clients.getClients();
+                for (final Client client : clientList) {
+                    final BaseClient baseClient = (BaseClient) client;
+                    baseClient.notifySessionRenewal(oldSessionId, context);
+                }
+            }
+        } else  {
             logger.error("Unable to renew the session. The session store may not support this feature");
         }
     }
@@ -136,5 +152,4 @@ public class DefaultCallbackLogic<R, C extends WebContext> implements CallbackLo
     public void setProfileManagerFactory(final Function<C, ProfileManager> factory) {
         this.profileManagerFactory = factory;
     }
-
 }

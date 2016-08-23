@@ -9,4 +9,8 @@ import org.pac4j.core.context.WebContext;
  * @since 1.4.0
  */
 public class NoLogoutHandler<C extends WebContext> implements CasLogoutHandler<C> {
+
+    @Override
+    public void renewSession(final String oldSessionId, final C context) {
+    }
 }

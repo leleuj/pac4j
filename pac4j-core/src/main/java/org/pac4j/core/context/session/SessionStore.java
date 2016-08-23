@@ -2,8 +2,6 @@ package org.pac4j.core.context.session;
 
 import org.pac4j.core.context.WebContext;
 
-import java.util.Optional;
-
 /**
  * To store data in session.
  *
@@ -42,6 +40,7 @@ public interface SessionStore<C extends WebContext> {
      * Invalidate the whole native session.
      *
      * @param context the web context
+     * @return whether the session has been invalidated
      */
     default boolean invalidateSession(C context) {
         // by default, the session has not been invalidated
@@ -54,9 +53,9 @@ public interface SessionStore<C extends WebContext> {
      * @param context the web context
      * @return the trackable object
      */
-    default Optional<Object> getTrackableSession(C context) {
+    default Object getTrackableSession(C context) {
         // by default, the session store does not know how to keep track the native session
-        return Optional.empty();
+        return null;
     }
 
     /**
@@ -66,9 +65,9 @@ public interface SessionStore<C extends WebContext> {
      * @param trackableSession the trackable session
      * @return the new session store
      */
-    default Optional<SessionStore<C>> buildFromTrackableSession(C context, Object trackableSession) {
+    default SessionStore<C> buildFromTrackableSession(C context, Object trackableSession) {
         // by default, the session store does not know how to build a new session store
-        return Optional.empty();
+        return null;
     }
 
     /**

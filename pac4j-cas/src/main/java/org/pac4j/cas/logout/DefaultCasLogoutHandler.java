@@ -11,7 +11,6 @@ import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,10 +31,10 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
     public void recordSession(final C context, final String ticket) {
         final SessionStore sessionStore = context.getSessionStore();
         final String sessionId = sessionStore.getOrCreateSessionId(context);
-        final Optional<Object> trackableSession = sessionStore.getTrackableSession(context);
+        final Object trackableSession = sessionStore.getTrackableSession(context);
 
-        if (trackableSession.isPresent()) {
-            logger.debug("ticket: {} -> trackableSession: {}", ticket, trackableSession.get());
+        if (trackableSession != null) {
+            logger.debug("ticket: {} -> trackableSession: {}", ticket, trackableSession);
             logger.debug("sessionId: {}", sessionId);
             store.set(ticket, trackableSession);
             store.set(sessionId, ticket);
@@ -56,13 +55,13 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
         store.remove(currentSessionId);
 
         if (CommonHelper.areEquals(ticket, sessionToTicket)) {
-            destroy(context, sessionStore);
+            destroy(context, sessionStore, "front");
         } else {
             logger.error("The user profiles (and session) can not be destroyed for CAS front channel logout because the provided ticket is not the same as the one linked to the current session");
         }
     }
 
-    protected void destroy(final C context, final SessionStore sessionStore) {
+    protected void destroy(final C context, final SessionStore sessionStore, final String channel) {
         // remove profiles
         final ProfileManager manager = new ProfileManager(context);
         manager.logout();
@@ -72,7 +71,7 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
             logger.debug("destroy the whole session");
             final boolean invalidated = sessionStore.invalidateSession(context);
             if (!invalidated) {
-                logger.error("The session has not been invalidated");
+                logger.error("The session has not been invalidated for {} channel logout", channel);
             }
         }
     }
@@ -88,19 +87,29 @@ public class DefaultCasLogoutHandler<C extends WebContext> implements CasLogoutH
 
             // renew context with the original session store
             final SessionStore sessionStore = context.getSessionStore();
-            final Optional<SessionStore> optNewSesionStore = sessionStore.buildFromTrackableSession(context, trackableSession);
-            if (optNewSesionStore.isPresent()) {
-                final SessionStore newSessionStore = optNewSesionStore.get();
+            final SessionStore<C> newSessionStore = sessionStore.buildFromTrackableSession(context, trackableSession);
+            if (newSessionStore != null) {
                 logger.debug("newSesionStore: {}", newSessionStore);
                 context.setSessionStore(newSessionStore);
                 final String sessionId = newSessionStore.getOrCreateSessionId(context);
                 logger.debug("remove sessionId: {}", sessionId);
                 store.remove(sessionId);
 
-                destroy(context, newSessionStore);
+                destroy(context, newSessionStore, "back");
             } else {
                 logger.error("The session store should be able to build a new session store from the tracked session");
             }
+        }
+    }
+
+    @Override
+    public void renewSession(final String oldSessionId, final C context) {
+        final String ticket = (String) store.get(oldSessionId);
+        logger.debug("oldSessionId: {} -> ticket: {}", oldSessionId, ticket);
+        if (ticket != null) {
+            store.remove(ticket);
+            store.remove(oldSessionId);
+            recordSession(context, ticket);
         }
     }
 

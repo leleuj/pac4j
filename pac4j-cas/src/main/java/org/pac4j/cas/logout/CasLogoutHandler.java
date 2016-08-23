@@ -52,4 +52,12 @@ public interface CasLogoutHandler<C extends WebContext> {
     default void destroySession(C context) {
         // do nothing by default
     }
+
+    /**
+     * Renew the web session.
+     *
+     * @param oldSessionId the old session identifier
+     * @param context the web context
+     */
+    void renewSession(String oldSessionId, C context);
 }
