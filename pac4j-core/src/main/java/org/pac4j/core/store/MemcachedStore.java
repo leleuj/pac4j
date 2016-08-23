@@ -6,7 +6,6 @@ import org.pac4j.core.store.serializer.JavaSerializer;
 import org.pac4j.core.store.serializer.Serializer;
 import org.pac4j.core.store.serializer.SerializerTranscoder;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.core.util.InitializableObject;
 
 /**
  * Store data in Memcached.
@@ -16,7 +15,7 @@ import org.pac4j.core.util.InitializableObject;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class MemcachedStore<K, O> extends InitializableObject implements Store<K, O> {
+public class MemcachedStore<K, O> extends AbstractMemoryStore<K, O> {
 
     private MemcachedClientIF client;
 
@@ -49,31 +48,18 @@ public class MemcachedStore<K, O> extends InitializableObject implements Store<K
     }
 
     @Override
-    public O get(final K key) {
-        init();
-
-        if (key != null) {
-            return client.get(serializer.serializeToBase64(key), this.transcoder);
-        }
-        return null;
+    protected O internalGet(final K key) {
+        return client.get(serializer.serializeToBase64(key), this.transcoder);
     }
 
     @Override
-    public void set(final K key, final O value) {
-        init();
-        CommonHelper.assertNotNull("value", value);
-
-        if (key != null) {
-            client.set(serializer.serializeToBase64(key), timeoutSeconds, value, this.transcoder);
-        }
+    protected void internalSet(final K key, final O value) {
+        client.set(serializer.serializeToBase64(key), timeoutSeconds, value, this.transcoder);
     }
 
     @Override
-    public void remove(final K key) {
-        init();
-        if (key != null) {
-            client.delete(serializer.serializeToBase64(key));
-        }
+    protected void internalRemove(final K key) {
+        client.delete(serializer.serializeToBase64(key));
     }
 
     public MemcachedClientIF getClient() {

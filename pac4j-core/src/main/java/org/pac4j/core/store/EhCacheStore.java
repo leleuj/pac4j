@@ -2,7 +2,6 @@ package org.pac4j.core.store;
 
 import org.ehcache.Cache;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.core.util.InitializableObject;
 
 /**
  * Store data in EhCache.
@@ -12,7 +11,7 @@ import org.pac4j.core.util.InitializableObject;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class EhCacheStore<K, O> extends InitializableObject implements Store<K, O> {
+public class EhCacheStore<K, O> extends AbstractMemoryStore<K, O> {
 
     private Cache<K, O> cache;
 
@@ -28,30 +27,18 @@ public class EhCacheStore<K, O> extends InitializableObject implements Store<K, 
     }
 
     @Override
-    public O get(final K key) {
-        init();
-        if (key != null) {
-            return cache.get(key);
-        }
-        return null;
+    protected O internalGet(final K key) {
+        return cache.get(key);
     }
 
     @Override
-    public void set(final K key, final O value) {
-        init();
-        CommonHelper.assertNotNull("value", value);
-
-        if (key != null) {
-            cache.put(key, value);
-        }
+    protected void internalSet(final K key, final O value) {
+        cache.put(key, value);
     }
 
     @Override
-    public void remove(final K key) {
-        init();
-        if (key != null) {
-            cache.remove(key);
-        }
+    protected void internalRemove(final K key) {
+        cache.remove(key);
     }
 
     public Cache<K, O> getCache() {

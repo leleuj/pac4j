@@ -3,7 +3,6 @@ package org.pac4j.core.store;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.core.util.InitializableObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @author Jerome Leleu
  * @since 1.9.2
  */
-public class GuavaStore<K, O> extends InitializableObject implements Store<K, O> {
+public class GuavaStore<K, O> extends AbstractMemoryStore<K, O> {
 
     private Cache<K, O> cache;
 
@@ -44,31 +43,18 @@ public class GuavaStore<K, O> extends InitializableObject implements Store<K, O>
     }
 
     @Override
-    public O get(final K key) {
-        init();
-
-        if (key != null) {
-            return cache.getIfPresent(key);
-        }
-        return null;
+    protected O internalGet(final K key) {
+        return cache.getIfPresent(key);
     }
 
     @Override
-    public void set(final K key, final O value) {
-        init();
-        CommonHelper.assertNotNull("value", value);
-
-        if (key != null) {
-            cache.put(key, value);
-        }
+    protected void internalSet(final K key, final O value) {
+        cache.put(key, value);
     }
 
     @Override
-    public void remove(final K key) {
-        init();
-        if (key != null) {
-            cache.invalidate(key);
-        }
+    protected void internalRemove(final K key) {
+        cache.invalidate(key);
     }
 
     public Cache<K, O> getCache() {
